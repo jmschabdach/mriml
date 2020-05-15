@@ -202,15 +202,18 @@ def reduceAndCluster(labels, data, demo, k, ctype):
     dfFewer = data.drop(columns=colDrop)
     dfFewer, demoFewer = unionDfs(dfFewer, demo)
 
-    if ctype == "spectral":
-        if dfFewer is not None and k is not None:
-            slabels2 = cl.spectralClustering(dfFewer.T, k).labels_
-        else:
-            slabels2 = []
-    elif ctype == "kmeans":
-        slabels2 = cl.kmeansClustering(dfFewer.T, k).labels_
-    elif ctype == "agg":
-        slabels2 = cl.sklearnAgg(dfFewer.T, k).labels_
+    if dfFewer.shape[1] > k :
+        if ctype == "spectral":
+            if dfFewer is not None and k is not None:
+                slabels2 = cl.spectralClustering(dfFewer.T, k).labels_
+            else:
+                slabels2 = []
+        elif ctype == "kmeans":
+            slabels2 = cl.kmeansClustering(dfFewer.T, k).labels_
+        elif ctype == "agg":
+            slabels2 = cl.sklearnAgg(dfFewer.T, k).labels_
+    else:
+        slabels = []
 
     vals, counts = np.unique(slabels2, return_counts=True)
     for i, j in zip(vals, counts):
@@ -230,7 +233,7 @@ def main():
     agegroup = "neonate"
     subjDir = base+"data/Neonates/"
     outFn = base+"mriml/clustering_results/"+agegroup+"_"+ctype+".csv"
-    demoFn = base+"dissertation_figure_generation/cleaned_"+agegroup+"_scan_info.csv"
+    demoFn = base+"mriml/demographics/cleaned_"+agegroup+"_scan_info.csv"
 
     boldFd, dagFd, tradFd, boldDvars, dagDvars, tradDvars, boldDice, dagDice, tradDice, boldMi, dagMi, tradMi = loadData(subjDir)
 
