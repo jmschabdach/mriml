@@ -1,0 +1,216 @@
+
+Demographic Label, Cohort
+Cluster, 0, 102
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 29, 0.28
+CONTROL, 73, 0.72
+
+Cluster, 1, 18
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 6, 0.33
+CONTROL, 12, 0.67
+
+Cluster, 0, 36
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 8, 0.22
+CONTROL, 28, 0.78
+
+Cluster, 1, 85
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 27, 0.32
+CONTROL, 58, 0.68
+
+Cluster, 0, 53
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 15, 0.28
+CONTROL, 38, 0.72
+
+Cluster, 1, 64
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 19, 0.3
+CONTROL, 45, 0.7
+
+Cluster, 0, 56
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 16, 0.29
+CONTROL, 40, 0.71
+
+Cluster, 1, 65
+Original value, count of class in cluster, percentage of cluster made up of class
+CHD, 19, 0.29
+CONTROL, 46, 0.71
+
+
+Demographic Label, Sex
+Cluster, 0, 18
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 8, 0.44
+Male, 8, 0.44
+Unknown, 2, 0.11
+
+Cluster, 1, 31
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 14, 0.45
+Male, 16, 0.52
+Unknown, 1, 0.03
+
+Cluster, 2, 71
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 36, 0.51
+Male, 29, 0.41
+Unknown, 6, 0.08
+
+Cluster, 0, 47
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 22, 0.47
+Male, 21, 0.45
+Unknown, 4, 0.09
+
+Cluster, 1, 56
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 28, 0.5
+Male, 25, 0.45
+Unknown, 3, 0.05
+
+Cluster, 2, 18
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 9, 0.5
+Male, 7, 0.39
+Unknown, 2, 0.11
+
+Cluster, 0, 15
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 6, 0.4
+Male, 7, 0.47
+Unknown, 2, 0.13
+
+Cluster, 1, 64
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 29, 0.45
+Male, 31, 0.48
+Unknown, 4, 0.06
+
+Cluster, 2, 38
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 21, 0.55
+Male, 15, 0.39
+Unknown, 2, 0.05
+
+Cluster, 0, 46
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 23, 0.5
+Male, 20, 0.43
+Unknown, 3, 0.07
+
+Cluster, 1, 22
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 13, 0.59
+Male, 8, 0.36
+Unknown, 1, 0.05
+
+Cluster, 2, 53
+Original value, count of class in cluster, percentage of cluster made up of class
+Female, 23, 0.43
+Male, 25, 0.47
+Unknown, 5, 0.09
+
+
+Demographic Label, Age At Scan
+
+Demographic Label, Sex/Age
+
+Demographic Label, Sex/Cohort
+Cluster, 0, 17
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.06
+Female CONTROL, 10, 0.59
+Male CHD, 2, 0.12
+Male CONTROL, 3, 0.18
+Unknown CONTROL, 1, 0.06
+
+Cluster, 1, 11
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 3, 0.27
+Female CONTROL, 2, 0.18
+Male CHD, 3, 0.27
+Male CONTROL, 3, 0.27
+
+Cluster, 2, 8
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CONTROL, 4, 0.5
+Male CHD, 3, 0.38
+Male CONTROL, 1, 0.12
+
+Cluster, 3, 10
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.1
+Female CONTROL, 1, 0.1
+Male CHD, 2, 0.2
+Male CONTROL, 5, 0.5
+Unknown CONTROL, 1, 0.1
+
+Cluster, 4, 15
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.07
+Female CONTROL, 5, 0.33
+Male CHD, 3, 0.2
+Male CONTROL, 4, 0.27
+Unknown CHD, 2, 0.13
+
+Cluster, 5, 14
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.07
+Female CONTROL, 5, 0.36
+Male CHD, 3, 0.21
+Male CONTROL, 5, 0.36
+
+Cluster, 0, 16
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 2, 0.12
+Female CONTROL, 6, 0.38
+Male CHD, 3, 0.19
+Male CONTROL, 3, 0.19
+Unknown CONTROL, 2, 0.12
+
+Cluster, 1, 15
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.07
+Female CONTROL, 5, 0.33
+Male CHD, 2, 0.13
+Male CONTROL, 5, 0.33
+Unknown CHD, 1, 0.07
+Unknown CONTROL, 1, 0.07
+
+Cluster, 2, 19
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 2, 0.11
+Female CONTROL, 7, 0.37
+Male CHD, 8, 0.42
+Male CONTROL, 1, 0.05
+Unknown CONTROL, 1, 0.05
+
+Cluster, 3, 16
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.06
+Female CONTROL, 9, 0.56
+Male CHD, 1, 0.06
+Male CONTROL, 3, 0.19
+Unknown CHD, 1, 0.06
+Unknown CONTROL, 1, 0.06
+
+Cluster, 4, 13
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 1, 0.08
+Female CONTROL, 6, 0.46
+Male CONTROL, 6, 0.46
+
+Cluster, 5, 15
+Original value, count of class in cluster, percentage of cluster made up of class
+Female CHD, 2, 0.13
+Female CONTROL, 4, 0.27
+Male CHD, 3, 0.2
+Male CONTROL, 5, 0.33
+Unknown CHD, 1, 0.07
+
+
+Demographic Label, Age/Cohort

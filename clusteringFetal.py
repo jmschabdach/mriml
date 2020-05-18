@@ -5,7 +5,7 @@ import pandas as pd
 from scipy import stats
 import os
 
-def loadData(preadDir):
+def loadData(sitePath):
     boldFdFn = os.path.join("metrics", "BOLD-displacement-metrics.csv")
     boldDvarsFn = os.path.join("metrics", "BOLD-intensity-metrics.csv")
     boldCrMatFn = os.path.join("metrics", "original-correlation-matrix.csv")
@@ -37,82 +37,76 @@ def loadData(preadDir):
     pDagDiceDf = pd.DataFrame()
     pDagMiDf = pd.DataFrame()
     
-    sites = sorted(os.listdir(preadDir)) #doesn't need to be sorted but I got used to it
-    # Iterate through the subjects in the cohort directory
-    for site in sites:
-        if os.path.isdir(os.path.join(preadDir, site)) and not "corrupt" in site:
-            sitePath = os.path.join(preadDir, site)
-            subjs = sorted(os.listdir(sitePath))
+    subjs = sorted(os.listdir(sitePath))
+    for subj in subjs:
+        print(subj)
+        subjPath = os.path.join(sitePath, subj)
+        if os.path.isdir(subjPath):
+            # load the BOLD FD data
+            df = pd.read_csv(os.path.join(subjPath, boldFdFn))[:100]
+            df = df.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pBoldFdDf = pd.concat([pBoldFdDf, df], axis=1)
     
-            for subj in subjs:
-                subjPath = os.path.join(sitePath, subj)
-                if os.path.isdir(subjPath):
-    #                 print(subj)
-                    # load the BOLD FD data
-                    df = pd.read_csv(os.path.join(subjPath, boldFdFn))[:100]
-                    df = df.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pBoldFdDf = pd.concat([pBoldFdDf, df], axis=1)
+            # load the BOLD DVARS data
+            df2 = pd.read_csv(os.path.join(subjPath, boldDvarsFn))[:100]
+            df2 = df2.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pBoldDvarsDf = pd.concat([pBoldDvarsDf, df2], axis=1)
     
-                    # load the BOLD DVARS data
-                    df2 = pd.read_csv(os.path.join(subjPath, boldDvarsFn))[:100]
-                    df2 = df2.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pBoldDvarsDf = pd.concat([pBoldDvarsDf, df2], axis=1)
+            # load the DAG FD data
+            df = pd.read_csv(os.path.join(subjPath, dagFdFn))[:100]
+            df = df.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pDagFdDf = pd.concat([pDagFdDf, df], axis=1)
     
-                    # load the DAG FD data
-                    df = pd.read_csv(os.path.join(subjPath, dagFdFn))[:100]
-                    df = df.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pDagFdDf = pd.concat([pDagFdDf, df], axis=1)
+            # load the DAG DVARS data
+            df2 = pd.read_csv(os.path.join(subjPath, dagDvarsFn))[:100]
+            df2 = df2.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pDagDvarsDf = pd.concat([pDagDvarsDf, df2], axis=1)
     
-                    # load the DAG DVARS data
-                    df2 = pd.read_csv(os.path.join(subjPath, dagDvarsFn))[:100]
-                    df2 = df2.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pDagDvarsDf = pd.concat([pDagDvarsDf, df2], axis=1)
+            # load the trad FD data
+            df = pd.read_csv(os.path.join(subjPath, tradFdFn))[:100]
+            df = df.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pTradFdDf = pd.concat([pTradFdDf, df], axis=1)
     
-                    # load the trad FD data
-                    df = pd.read_csv(os.path.join(subjPath, tradFdFn))[:100]
-                    df = df.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pTradFdDf = pd.concat([pTradFdDf, df], axis=1)
+            # load the trad DVARS data
+            df2 = pd.read_csv(os.path.join(subjPath, tradDvarsFn))[:100]
+            df2 = df2.rename(columns={"0":subj})
+            # add the BOLD FD data to the dataframe of BOLD FD data
+            pTradDvarsDf = pd.concat([pTradDvarsDf, df2], axis=1)
     
-                    # load the trad DVARS data
-                    df2 = pd.read_csv(os.path.join(subjPath, tradDvarsFn))[:100]
-                    df2 = df2.rename(columns={"0":subj})
-                    # add the BOLD FD data to the dataframe of BOLD FD data
-                    pTradDvarsDf = pd.concat([pTradDvarsDf, df2], axis=1)
+            # BOLD Dice
+            mat = np.loadtxt(open(os.path.join(subjPath, boldDiceMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pBoldDiceDf = pd.concat([pBoldDiceDf, df], axis=1)
     
-                    # BOLD Dice
-                    mat = np.loadtxt(open(os.path.join(subjPath, boldDiceMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pBoldDiceDf = pd.concat([pBoldDiceDf, df], axis=1)
+            # BOLD MI
+            mat = np.loadtxt(open(os.path.join(subjPath, boldMiMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pBoldMiDf = pd.concat([pBoldMiDf, df], axis=1)
+
+            # DAG Dice
+            mat = np.loadtxt(open(os.path.join(subjPath, dagDiceMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pDagDiceDf = pd.concat([pDagDiceDf, df], axis=1)
+
+            # DAG MI
+            mat = np.loadtxt(open(os.path.join(subjPath, dagMiMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pDagMiDf = pd.concat([pDagMiDf, df], axis=1)
     
-                    # BOLD MI
-                    mat = np.loadtxt(open(os.path.join(subjPath, boldMiMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pBoldMiDf = pd.concat([pBoldMiDf, df], axis=1)
+            # Traditional Dice
+            mat = np.loadtxt(open(os.path.join(subjPath, tradDiceMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pTradDiceDf = pd.concat([pTradDiceDf, df], axis=1)
     
-                    # DAG Dice
-                    mat = np.loadtxt(open(os.path.join(subjPath, dagDiceMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pDagDiceDf = pd.concat([pDagDiceDf, df], axis=1)
-    
-                    # DAG MI
-                    mat = np.loadtxt(open(os.path.join(subjPath, dagMiMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pDagMiDf = pd.concat([pDagMiDf, df], axis=1)
-    
-                    # Traditional Dice
-                    mat = np.loadtxt(open(os.path.join(subjPath, tradDiceMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pTradDiceDf = pd.concat([pTradDiceDf, df], axis=1)
-    
-                    # Traditional MI
-                    mat = np.loadtxt(open(os.path.join(subjPath, tradMiMatFn), "r"), delimiter=",")[:100, :100]
-                    df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
-                    pTradMiDf = pd.concat([pTradMiDf, df], axis=1)
+            # Traditional MI
+            mat = np.loadtxt(open(os.path.join(subjPath, tradMiMatFn), "r"), delimiter=",")[:100, :100]
+            df = pd.DataFrame(data=mat.flatten().T, columns=[subj])
+            pTradMiDf = pd.concat([pTradMiDf, df], axis=1)
 
     # Drop rows containing nan
     boldFdDf = pBoldFdDf.fillna(2)
@@ -230,9 +224,9 @@ def reduceAndCluster(labels, data, demo, k, ctype):
 
 def main():
     base = "/home/jms565/Research/mriml/"
-    ctype = "spectral" # problems with spectral for preads
+    ctype = "agg" # problems with spectral for preads
     agegroup = "fetal"
-    subjDir = "/mnt/research/data/Fetal/"
+    subjDir = "/mnt/research/data/Fetal/brain/"
     outFn = base+"clustering_results/"+agegroup+"_"+ctype+".csv"
     demoFn = base+"demographics/cleaned_"+agegroup+"_scan_info.csv"
 
@@ -269,7 +263,7 @@ def main():
                    "dTrad FD", "dTrad DVARS", "dTrad Dice", "dTrad MI",
                    "dDag FD", "dDag DVARS", "dDag Dice", "dDag MI"]
     
-    demo = ['Site', 'Cohort', 'Sex', 'Age At Scan', 'Sex/Age','Sex/Cohort','Age/Cohort']
+    demo = ['Cohort', 'Sex', 'Age At Scan', 'Sex/Age','Sex/Cohort','Age/Cohort']
     
     for d in demo: 
         with open(outFn, 'a') as f:
