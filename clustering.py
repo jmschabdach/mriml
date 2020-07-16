@@ -16,7 +16,7 @@ import umap
 
 from scipy import stats
 
-def agglomerativeClustering(df, demoDf, metric, label, thresh, outFn=""):
+def agglomerativeClustering(df, demoDf, metric, label, clusterRows=False, useMask=False, outFn=""):
 
     # Filter DFs
     metaScans = list(set(list(demoDf['ID'])))
@@ -30,12 +30,21 @@ def agglomerativeClustering(df, demoDf, metric, label, thresh, outFn=""):
     demoDf = demoDf[demoDf['ID'].isin(metaScans)]
     df = df.drop(columns=extraMetrics)
 
+    # Generate a mask
+    if useMask:
+        mask = np.ones_like(df, dtype=np.bool)
+        locs = np.where(df != 0.0)
+        for i, j in zip(locs[0], locs[1]):
+            mask[i][j] = False
+    else:
+        mask = None
+
     demoDf = demoDf.drop_duplicates(subset=['ID'])
 
     print(demoDf.shape)
     print(df.shape)
 
-    # Colormap
+    # Colormap for column labels
     cmap = plt.get_cmap('tab10')
     colors=[]
     for i in range(len(np.unique(demoDf[label]))):
@@ -48,25 +57,25 @@ def agglomerativeClustering(df, demoDf, metric, label, thresh, outFn=""):
 #     print(col_colors.get_values())
 
     # Generate figure
-    g = sns.clustermap(df.fillna(thresh).clip(upper=thresh), metric='minkowski', row_cluster=False,
-                       col_colors=col_colors.get_values(), cmap="plasma")
+    g = sns.clustermap(df, mask=mask, metric='minkowski', row_cluster=clusterRows,
+                       col_colors=col_colors.values, cmap='plasma')
 
     for l in lut:
         g.ax_col_dendrogram.bar(0, 0, color=lut[l], label=l, linewidth=0)
 
     g.ax_col_dendrogram.legend(loc="upper center", ncol=len(np.unique(demoDf[label])))
-    g.cax.set_position([.17, .2, .03, .45])
+    g.cax.set_position([.99, .2, .03, .45])
 
     label = label.replace("_", " ")
     g.fig.suptitle("Agglomerative Clustering of Clinical Brain Images "+metric+" by "+label,
-                   x=0.6, y=.9,
+                   x=0.6, y=1.0,
                    ha='center', va='bottom')
 
     if outFn != "":
         plt.savefig(outFn, bbox_inches='tight', pad_inches=0.01)
 
 
-def kmeansClustering(df, k):
+def kmeans(df, k):
     kmeans = KMeans(n_clusters=k, random_state=0).fit(df)
     return kmeans
 
