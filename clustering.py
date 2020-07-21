@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from matplotlib import cm
 from matplotlib.lines import Line2D
 from matplotlib.patches import Patch
 from matplotlib.gridspec import GridSpec
@@ -16,19 +17,9 @@ import umap
 
 from scipy import stats
 
-def agglomerativeClustering(df, demoDf, metric, label, clusterRows=False, useMask=False, outFn=""):
-
-    # Filter DFs
-    metaScans = list(set(list(demoDf['ID'])))
-    metricScans = list(set(list(df)))
-
-    extraMeta = [ i for i in metaScans if i not in metricScans]
-    extraMetrics = [ i for i in metricScans if i not in metaScans]
-
-    metaScans = [i for i in metaScans if i not in extraMeta]
-
-    demoDf = demoDf[demoDf['ID'].isin(metaScans)]
-    df = df.drop(columns=extraMetrics)
+##
+#
+def agglomerativeClustering(df, labels, titleString, clusterRows=False, useMask=False, outFn=""):
 
     # Generate a mask
     if useMask:
@@ -39,40 +30,37 @@ def agglomerativeClustering(df, demoDf, metric, label, clusterRows=False, useMas
     else:
         mask = None
 
-    demoDf = demoDf.drop_duplicates(subset=['ID'])
-
-    print(demoDf.shape)
-    print(df.shape)
+    # Colormap for data
+    my_cmap = cm.get_cmap('plasma')
+    my_cmap.set_bad((0,0,0))
 
     # Colormap for column labels
     cmap = plt.get_cmap('tab10')
     colors=[]
-    for i in range(len(np.unique(demoDf[label]))):
+    for i in range(len(np.unique(labels))):
         colors.append(cmap(i))
 
-    lut = dict(zip(np.unique(demoDf[label]), colors))
-    col_colors = demoDf[label].map(lut)
-#     print(len(demoDf[label]))
-#     print(len(col_colors))
-#     print(col_colors.get_values())
+    lut = dict(zip(np.unique(labels), colors))
+    col_colors = [lut[i] for i in labels] 
 
     # Generate figure
     g = sns.clustermap(df, mask=mask, metric='minkowski', row_cluster=clusterRows,
-                       col_colors=col_colors.values, cmap='plasma')
+                       col_colors=col_colors, cmap=my_cmap)
 
     for l in lut:
         g.ax_col_dendrogram.bar(0, 0, color=lut[l], label=l, linewidth=0)
 
-    g.ax_col_dendrogram.legend(loc="upper center", ncol=len(np.unique(demoDf[label])))
+    g.ax_col_dendrogram.legend(loc="upper center", ncol=len(np.unique(labels)))
     g.cax.set_position([.99, .2, .03, .45])
 
-    label = label.replace("_", " ")
-    g.fig.suptitle("Agglomerative Clustering of Clinical Brain Images "+metric+" by "+label,
+    g.fig.suptitle("Agglomerative Clustering of Clinical Brain Images "+titleString,
                    x=0.6, y=1.0,
                    ha='center', va='bottom')
 
     if outFn != "":
         plt.savefig(outFn, bbox_inches='tight', pad_inches=0.01)
+
+    return g
 
 
 def kmeans(df, k):
