@@ -43,9 +43,12 @@ def load_metadata_file(fn, group):
     if 'Unnamed: 0' in list(df):
         df = df.drop(columns=['Unnamed: 0'])
 
+    # Transpose the demographics dataframe and make the column headers subject IDs
+    df = df.set_index('ID').T
+
     return df
 
-## Created a cleaned DataFrame from a list of disjoint DataFrames
+## Create a cleaned DataFrame from a list of disjoint DataFrames
 #  @param dataList A list of DataFrames to combine and clean
 #  @return df The cleaned DataFrame
 def combine_and_clean(dataList):
@@ -60,10 +63,21 @@ def combine_and_clean(dataList):
 
     return df
 
-##
-# 
-def union_of_dfs(df1, df2):
-    pass
+## Only keep the columns from each dataframe that are present in both dataframes
+#  @param df1 Dataframe to filter
+#  @param df2 Dataframe to filter
+#  @return df1 Dataframe with only shared columns
+#  @return df2 Dataframe with only shared columns
+def keep_shared_columns(df1, df2):
+
+    # Find the shared columns
+    commonCols = list(np.intersect1d(df1.columns, df2.columns))
+
+    # Keep only the shared columns
+    df1 = df1[commonCols]
+    df2 = df2[commonCols]
+    
+    return df1, df2
 
 ## Load the same metrics file for a group of subjects and store in DataFrame
 #  @param subjects List of subjects
