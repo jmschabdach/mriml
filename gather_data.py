@@ -5,18 +5,24 @@ import os
 ## Load a vector of metrics from a single file
 #  @param fn The path to the .csv file
 #  @return df The loaded DataFrame with a column header of the subject's ID
-def load_vector_file(fn):
+def load_vector_file(fn, length=None):
     subjId = fn.split("/")[-3]
-    df = pd.read_csv(fn)
+    if length is not None:
+        df = pd.read_csv(fn)[:length]
+    else:
+        df = pd.read_csv(fn)
     df = df.rename(columns={"0":subjId})
     return df
 
 ## Load a matrix of metrics from a single file
 #  @param fn The path to the .csv file
 #  @return df The flattened matrix as a DataFrame with a column header of the subject's ID
-def load_matrix_file(fn):
+def load_matrix_file(fn, length=None):
     subjId = fn.split("/")[-3]
-    mat = np.loadtxt(open(fn, "r"),  delimiter=",")
+    if length is not None:
+        mat = np.loadtxt(open(fn, "r"),  delimiter=",")[:length][:length]
+    else:
+        mat = np.loadtxt(open(fn, "r"), delimiter=",")
     df = pd.DataFrame(data=mat.flatten().T, columns=[subjId])
     return df
 
@@ -37,7 +43,8 @@ def load_metadata_file(fn, group):
     df['Age_Group'] = [group for i in range(df.shape[0])]
 
     # Joint Groups - might remove
-    df['Sex/Age'] = df['Sex'] + ' ' + df['Age At Scan'].astype(str)
+    if 'Sex' in list(df) and 'Age At Scan' in list(df):
+        df['Sex/Age'] = df['Sex'] + ' ' + df['Age At Scan'].astype(str)
 
     # Drop an unnecessary index column
     if 'Unnamed: 0' in list(df):
@@ -64,26 +71,21 @@ def combine_and_clean(dataList):
     return df
 
 ## Only keep the columns from each dataframe that are present in both dataframes
-#  @param df1 Dataframe to filter
-#  @param df2 Dataframe to filter
-#  @return df1 Dataframe with only shared columns
-#  @return df2 Dataframe with only shared columns
-def keep_shared_columns(df1, df2):
-
-    # Find the shared columns
-    commonCols = list(np.intersect1d(df1.columns, df2.columns))
-
+#  @param df Dataframe to filter
+#  @param columns List of columns to keep
+#  @return df Dataframe with only shared columns
+def keep_shared_columns(df, columns):
     # Keep only the shared columns
-    df1 = df1[commonCols]
-    df2 = df2[commonCols]
-    
-    return df1, df2
+    df = df[columns]
+        
+    return df
 
 ## Load the same metrics file for a group of subjects and store in DataFrame
 #  @param subjects List of subjects
 #  @param metricFn String specifying metrics file
+#  @param length Integer specifying the size of the metrics to load 
 #  @param metricType String specifying vector or matrix
-def load_population_metrics(subjects, metricFn, isVector=True):
+def load_population_metrics(subjects, metricFn, length, isVector=True):
 
     metrics = []
 
@@ -93,9 +95,9 @@ def load_population_metrics(subjects, metricFn, isVector=True):
 
         # Load the file
         if isVector:
-            tmpDf = load_vector_file(fn)
+            tmpDf = load_vector_file(fn, length)
         else:
-            tmpDf = load_matrix_file(fn)
+            tmpDf = load_matrix_file(fn, length)
 
         # Add the loaded DataFrame to the list of metrics
         metrics.append(tmpDf)

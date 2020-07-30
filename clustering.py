@@ -10,6 +10,8 @@ import os
 
 import fastcluster
 from sklearn.cluster import SpectralClustering, KMeans, AgglomerativeClustering
+from scipy.cluster import hierarchy
+from scipy.spatial import distance
 from sklearn import manifold
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
@@ -17,14 +19,57 @@ import umap
 
 from scipy import stats
 
+## Generate column labels for the Seaborn clustermap
+#  @param labels A numpy.ndarray or a list of numpy.ndarray objects containing subject labels
+#  @return colors A list (or list of lists) of colors representing the subject labels 
+#  @return lut A dictionary mapping unique label values to their representative colors
+def generateColumnLabels(labels):
+
+    cmap = plt.get_cmap('tab10')
+    lut = {}
+    colors = []
+
+    for l in range(len(np.unique(labels))):
+        lut[np.unique(labels)[l]] = cmap(l)
+
+    if type(labels) is list:
+        for lset in labels:
+            colors.append([lut[i] for i in lset])
+
+    else:
+        colors = [lut[i] for i in labels]
+
+    return colors, lut
+
 ##
 #
-def agglomerativeClustering(df, labels, titleString, clusterRows=False, useMask=False, outFn=""):
+def makeParallelPlots(df, labels, titleString, orderMagnitude=False, useMask=False, outFn=""):
+    # If orderMagnitude, sort the metric values
+    if orderMagnitude:
+        df = pd.DataFrame({key: sorted(value.values(), reverse=True) for key, value in df.to_dict().items()})
+
+    # Get the column colors from the labels
+    colColors, legendLut = generateColumnLabels(labels)
+
+    # Perform the clustering
+    colLinkages = seabornAgg(df)
+
+    # Graph the results on a linear scale
+    g_lin = graphSeabornAgg(df, colColors, legendLut, colLinkages, titleString+" Linear Scale")
+
+    # Graph the results on a log scale
+    loggedDf = (np.log(df)) #.replace(-np.inf, 0)
+    g_log = graphSeabornAgg(loggedDf, colColors, legendLut, colLinkages, titleString+" Log Scale")
+
+
+##
+#
+def graphSeabornAgg(df, col_colors, lut, colLinks, titleString, useMask=False, outFn=""):
 
     # Generate a mask
     if useMask:
         mask = np.ones_like(df, dtype=np.bool)
-        locs = np.where(df != 0.0)
+        locs = np.where(df != -np.inf)
         for i, j in zip(locs[0], locs[1]):
             mask[i][j] = False
     else:
@@ -34,21 +79,14 @@ def agglomerativeClustering(df, labels, titleString, clusterRows=False, useMask=
     my_cmap = cm.get_cmap('plasma')
     my_cmap.set_bad((0,0,0))
 
-    # Colormap for column labels
-    cmap = plt.get_cmap('tab10')
-    colors=[]
-    for i in range(len(np.unique(labels))):
-        colors.append(cmap(i))
-
-    lut = dict(zip(np.unique(labels), colors))
-    col_colors = [lut[i] for i in labels] 
-
     # Generate figure
-    g = sns.clustermap(df, mask=mask, metric='minkowski', row_cluster=clusterRows,
+    g = sns.clustermap(df, row_cluster=False, col_linkage=colLinks, mask=mask, 
                        col_colors=col_colors, cmap=my_cmap)
 
+    labels = []
     for l in lut:
         g.ax_col_dendrogram.bar(0, 0, color=lut[l], label=l, linewidth=0)
+        labels.append(l)
 
     g.ax_col_dendrogram.legend(loc="upper center", ncol=len(np.unique(labels)))
     g.cax.set_position([.99, .2, .03, .45])
@@ -74,6 +112,10 @@ def spectralClustering(df, k):
 def sklearnAgg(df, k):
     agg = AgglomerativeClustering(n_clusters=k).fit(df)
     return agg
+
+def seabornAgg(df):
+    colLinks = hierarchy.linkage(distance.pdist(df.T, metric="minkowski"), method="average")
+    return colLinks
 
 def getPCAVecs(df):
     new_vecs = PCA(n_components=2, random_state=0).fit_transform(df)
