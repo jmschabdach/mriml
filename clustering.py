@@ -16,7 +16,7 @@ from sklearn import manifold
 from sklearn.manifold import TSNE
 from sklearn.decomposition import PCA
 from sklearn.metrics import silhouette_score
-import umap
+import umap.umap_ as umap
 
 from scipy import stats
 
@@ -36,7 +36,7 @@ def generateColumnLabels(labels):
 
     if type(labels) is list:
         for lset in labels:
-            colors.append([lut[i] for i in lset])
+            colors.append(lut[lset])
 
     else:
         colors = [lut[i] for i in labels]
@@ -46,6 +46,7 @@ def generateColumnLabels(labels):
 ##
 #
 def makeNormAndLogPlots(df, labels, titleString, orderMagnitude=False, useMask=False, outFn=""):
+    print(outFn)
     # If orderMagnitude, sort the metric values
     if orderMagnitude:
         df = pd.DataFrame({key: sorted(value.values(), reverse=True) for key, value in df.to_dict().items()})
@@ -58,11 +59,13 @@ def makeNormAndLogPlots(df, labels, titleString, orderMagnitude=False, useMask=F
     colLinkages, results = agglomerative(dists, k=3)
 
     # Graph the results on a linear scale
-    g_lin = agglomerativeClustermap(df, colColors, legendLut, colLinkages, titleString+" Linear Scale", outFn+"_linear_scale.png")
+    g_lin = agglomerativeClustermap(df, colColors, legendLut, colLinkages, titleString+" Linear Scale", outFn=outFn+"_linear_scale.png")
 
     # Graph the results on a log scale
     loggedDf = (np.log(df)) #.replace(-np.inf, 0)
-    g_log = agglomerativeClustermap(loggedDf, colColors, legendLut, colLinkages, titleString+" Log Scale", outFn+"_log_scale.png")
+    g_log = agglomerativeClustermap(loggedDf, colColors, legendLut, colLinkages, titleString+" Log Scale", outFn=outFn+"_log_scale.png")
+
+    return g_lin, g_log
 
 
 ##
@@ -106,7 +109,11 @@ def agglomerativeClustermap(df, col_colors, lut, colLinks, titleString, useMask=
 def calculateDistance(df):
     # Calculate the distance matrix
     dists = distance.pdist(df.T, metric="cosine")
-    return dists 
+
+    if len(dists.shape) == 1:
+        return distance.squareform(dists)
+    else:
+        return dists 
 
 ## Compute the linkages between data samples, then cluster using agglomerative clustering
 #  @param df Dataframe object of shape nxm where n is the number of samples and m is the number of features
@@ -116,15 +123,18 @@ def agglomerative(df, k):
     print(df.shape)
     # Calculate the linkages between the clusters
     dists = calculateDistance(df.T)
-    print(distance.squareform(dists).shape)
-    links = hierarchy.linkage(np.nan_to_num(distance.squareform(dists)), method="complete")
+    if len(dists.shape) == 1:
+        dists = distance.squareform(dists)
+    links = hierarchy.linkage(np.nan_to_num(dists), method="complete")
     # Create the clustering model
     agg = AgglomerativeClustering(n_clusters=k, 
                                   affinity='precomputed',  # use the distance matrix
                                   linkage='complete')      # max of all distances between all observations of 2 sets
 
     # Perform clustering and return the cluster labels for the data points
-    clusterResults = agg.fit_predict(np.nan_to_num(distance.squareform(dists)))
+    if len(dists.shape) == 1:
+        dists = distance.squareform(dists)
+    clusterResults = agg.fit_predict(np.nan_to_num(dists))
     
     return links, clusterResults
 
